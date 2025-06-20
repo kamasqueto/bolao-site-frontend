@@ -53,12 +53,12 @@ export default function Home() {
             <h2 className="text-xl font-bold text-blue-800 mb-2">Próximo jogo</h2>
             <div className="flex items-center justify-center gap-4">
               <div className="flex items-center gap-2">
-                <img src={nextGame.logoA} alt={nextGame.teamA} className="w-8 h-8" />
+                <img src={`/escudos/${nextGame.logoA}.png`} alt={nextGame.teamA} className="w-8 h-8" />
                 <span className="font-semibold">{nextGame.teamA}</span>
               </div>
               <span className="text-gray-500 font-bold">vs</span>
               <div className="flex items-center gap-2">
-                <img src={nextGame.logoB} alt={nextGame.teamB} className="w-8 h-8" />
+                <img src={`/escudos/${nextGame.logoB}.png`} alt={nextGame.teamB} className="w-8 h-8" />
                 <span className="font-semibold">{nextGame.teamB}</span>
               </div>
             </div>
