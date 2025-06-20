@@ -88,7 +88,6 @@ export default function Palpitar() {
         }, {
           headers: { Authorization: `Bearer ${token}` },
         });
-
         setMensagens(prev => ({ ...prev, [jogoId]: 'Palpite atualizado com sucesso!' }));
       } else {
         await api.post(`/api/guesses`, {
@@ -98,7 +97,6 @@ export default function Palpitar() {
         }, {
           headers: { Authorization: `Bearer ${token}` },
         });
-
         setMensagens(prev => ({ ...prev, [jogoId]: 'Palpite salvo com sucesso!' }));
       }
     } catch (err) {
@@ -118,7 +116,7 @@ export default function Palpitar() {
           const jogoIniciado = agora.isAfter(dataJogo.subtract(10, 'minutes'));
 
           return (
-            <div key={jogo.id} className="border p-4 rounded shadow bg-white">
+            <div key={jogo.id} className="border p-4 rounded shadow bg-white w-full min-w-[300px] max-w-full overflow-hidden">
               <div className="text-sm text-gray-500 text-center mb-2">
                 {dataJogo.format('DD/MM/YYYY [às] HH:mm')}<br />
                 {jogo.status === 'in_progress'
@@ -129,18 +127,14 @@ export default function Palpitar() {
               </div>
 
               <div className="flex justify-center items-center gap-6 mb-4 text-center">
-                {/* Time A */}
-                <div className="w-28">
-                  <img src={`/escudos/${jogo.teamA}.png`} alt={jogo.teamA} className="w-12 h-12 mx-auto" />
-                  <p className="font-semibold truncate">{jogo.teamA}</p>
+                <div className="w-32 flex flex-col items-center">
+                  <img src={`/escudos/${jogo.teamA}.png`} alt={jogo.teamA} className="w-12 h-12 mb-1" />
+                  <p className="font-semibold text-sm leading-tight text-center break-words min-h-[2.5rem]">{jogo.teamA}</p>
                 </div>
 
-                {/* Placar / Input */}
-                <div className="flex gap-2 items-center justify-center w-28">
+                <div className="flex items-center justify-center gap-2 w-28 flex-shrink-0">
                   {jogo.status === 'completed' ? (
-                    <div className="text-1xl font-bold">
-                      {jogo.scoreA} x {jogo.scoreB}
-                    </div>
+                    <div className="text-xl font-bold w-full text-center">{jogo.scoreA} x {jogo.scoreB}</div>
                   ) : (
                     <>
                       <input
@@ -162,14 +156,12 @@ export default function Palpitar() {
                   )}
                 </div>
 
-                {/* Time B */}
-                <div className="w-28">
-                  <img src={`/escudos/${jogo.teamB}.png`} alt={jogo.teamB} className="w-12 h-12 mx-auto" />
-                  <p className="font-semibold truncate">{jogo.teamB}</p>
+                <div className="w-32 flex flex-col items-center">
+                  <img src={`/escudos/${jogo.teamB}.png`} alt={jogo.teamB} className="w-12 h-12 mb-1" />
+                  <p className="font-semibold text-sm leading-tight text-center break-words min-h-[2.5rem]">{jogo.teamB}</p>
                 </div>
               </div>
 
-              {/* Botão */}
               {jogo.status !== 'completed' && (
                 <div className="flex justify-center">
                   <button
@@ -182,14 +174,12 @@ export default function Palpitar() {
                 </div>
               )}
 
-              {/* Mensagem */}
               {mensagens[jogo.id] && (
                 <p className="text-sm text-green-600 text-center mt-2">
                   {mensagens[jogo.id]}
                 </p>
               )}
 
-              {/* Palpites de outros */}
               {jogoIniciado && palpitesOutros[jogo.id] && (
                 <div className="mt-4 border-t pt-3">
                   <p className="text-sm text-gray-700 font-semibold mb-1">Palpites dos outros jogadores:</p>
