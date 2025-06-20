@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 const API_URL = import.meta.env.VITE_API_URL;
+import api from '../hooks/axios.js'
 
 export default function Home() {
   const [nextGame, setNextGame] = useState(null);
@@ -12,8 +13,8 @@ export default function Home() {
   useEffect(() => {
     async function fetchGames() {
       try {
-        const resNext = await axios.get(`${API_URL}/api/games/next`);
-        const resUpcoming = await axios.get(`${API_URL}/api/games/upcoming`);
+        const resNext = await api.get(`/api/games/next`);
+        const resUpcoming = await api.get(`/api/games/upcoming`);
         setNextGame(resNext.data);
         setUpcomingGames(resUpcoming.data);
       } catch (err) {
