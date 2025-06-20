@@ -68,30 +68,7 @@ export default function Home() {
           </div>
         )}
 
-        {upcomingGames.length > 0 && (
-          <div className="bg-white p-6 rounded shadow-md mb-8">
-            <h2 className="text-lg font-bold text-blue-800 mb-4">Próximos Jogos</h2>
-            <div className="space-y-4">
-              {upcomingGames.map((game) => (
-                <div
-                  key={game.id}
-                  className="flex items-center justify-between border-b pb-2"
-                >
-                  <div className="flex items-center gap-2">
-                    <img src={`/escudos/${nextGame.teamA}.png`} alt={game.teamA} className="w-6 h-6" />
-                    <span className="font-medium text-gray-800">{game.teamA}</span>
-                    <span className="mx-1 text-gray-500">x</span>
-                    <span className="font-medium text-gray-800">{game.teamB}</span>
-                    <img src={`/escudos/${nextGame.teamB}.png`} alt={game.teamB} className="w-6 h-6" />
-                  </div>
-                  <span className="text-sm text-gray-600">
-                    {new Date(game.date).toLocaleString('pt-BR')}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+        
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-center mb-8">
           <div className="bg-white p-4 rounded shadow hover:shadow-lg cursor-pointer" onClick={() => navigate('/jogos')}>
