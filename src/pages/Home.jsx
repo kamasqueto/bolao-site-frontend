@@ -78,11 +78,11 @@ export default function Home() {
                   className="flex items-center justify-between border-b pb-2"
                 >
                   <div className="flex items-center gap-2">
-                    <img src={game.logoA} alt={game.teamA} className="w-6 h-6" />
+                    <img src={game.teamA} alt={game.teamA} className="w-6 h-6" />
                     <span className="font-medium text-gray-800">{game.teamA}</span>
                     <span className="mx-1 text-gray-500">x</span>
                     <span className="font-medium text-gray-800">{game.teamB}</span>
-                    <img src={game.logoB} alt={game.teamB} className="w-6 h-6" />
+                    <img src={game.teamB} alt={game.teamB} className="w-6 h-6" />
                   </div>
                   <span className="text-sm text-gray-600">
                     {new Date(game.date).toLocaleString('pt-BR')}
