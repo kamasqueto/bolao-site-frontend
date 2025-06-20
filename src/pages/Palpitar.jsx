@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import { useAuthRedirect } from '../hooks/useAuthRedirect';
-import api from '../hooks/axios.js'
+import api from '../hooks/axios.js';
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Palpitar() {
@@ -73,43 +73,39 @@ export default function Palpitar() {
   };
 
   const enviarPalpite = async (jogoId) => {
-  try {
-    const token = localStorage.getItem('token');
-    const { scoreA, scoreB } = placares[jogoId] || {};
+    try {
+      const token = localStorage.getItem('token');
+      const { scoreA, scoreB } = placares[jogoId] || {};
 
-    const resExistente = await api.get(`/api/guesses/mine/${jogoId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    if (resExistente.data) {
-      // Atualiza palpite existente
-      console.log(resExistente.data);
-      await api.put(`/api/guesses/${resExistente.data.id}`, {
-        guessA: Number(scoreA),
-        guessB: Number(scoreB),
-      }, {
+      const resExistente = await api.get(`/api/guesses/mine/${jogoId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      setMensagens(prev => ({ ...prev, [jogoId]: 'Palpite atualizado com sucesso!' }));
-    } else {
-      // Cria novo palpite
-      await api.post(`/api/guesses`, {
-        gameId: jogoId,
-        guessA: Number(scoreA),
-        guessB: Number(scoreB),
-      }, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      if (resExistente.data) {
+        await api.put(`/api/guesses/${resExistente.data.id}`, {
+          guessA: Number(scoreA),
+          guessB: Number(scoreB),
+        }, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-      setMensagens(prev => ({ ...prev, [jogoId]: 'Palpite salvo com sucesso!' }));
+        setMensagens(prev => ({ ...prev, [jogoId]: 'Palpite atualizado com sucesso!' }));
+      } else {
+        await api.post(`/api/guesses`, {
+          gameId: jogoId,
+          guessA: Number(scoreA),
+          guessB: Number(scoreB),
+        }, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        setMensagens(prev => ({ ...prev, [jogoId]: 'Palpite salvo com sucesso!' }));
+      }
+    } catch (err) {
+      console.error('Erro ao enviar palpite:', jogoId, err);
+      setMensagens(prev => ({ ...prev, [jogoId]: 'Erro ao salvar palpite.' }));
     }
-  } catch (err) {
-    console.error('Erro ao enviar palpite:', jogoId ,err);
-    setMensagens(prev => ({ ...prev, [jogoId]: 'Erro ao salvar palpite.' }));
-  }
-};
-
+  };
 
   return (
     <div className="max-w-5xl mx-auto mt-6 px-4">
@@ -128,75 +124,79 @@ export default function Palpitar() {
                 {jogo.status === 'in_progress'
                   ? 'Em andamento'
                   : jogo.status === 'completed'
-                  ? 'Finalizado'
-                  : 'Agendado'}
+                    ? 'Finalizado'
+                    : 'Agendado'}
               </div>
 
-              <div className="flex justify-between items-center mb-4">
-                <div className="text-center">
+              <div className="flex justify-center items-center gap-6 mb-4 text-center">
+                {/* Time A */}
+                <div className="w-28">
                   <img src={`/escudos/${jogo.teamA}.png`} alt={jogo.teamA} className="w-12 h-12 mx-auto" />
-                  <p className="font-semibold">{jogo.teamA}</p>
+                  <p className="font-semibold truncate">{jogo.teamA}</p>
                 </div>
 
-                <div className="flex gap-2 items-center">
-  {jogo.status === 'completed' ? (
-    <div className="text-1xl font-bold">
-      {jogo.scoreA} x {jogo.scoreB}
-    </div>
-  ) : (
-    <>
-      <input
-        type="number"
-        className="w-12 h-12 text-center border rounded"
-        value={placares[jogo.id]?.scoreA ?? ''}
-        onChange={e => handleChange(jogo.id, 'scoreA', e.target.value)}
-        disabled={jogoIniciado}
-      />
-      <span className="font-bold">x</span>
-      <input
-        type="number"
-        className="w-12 h-12 text-center border rounded"
-        value={placares[jogo.id]?.scoreB ?? ''}
-        onChange={e => handleChange(jogo.id, 'scoreB', e.target.value)}
-        disabled={jogoIniciado}
-      />
-    </>
-  )}
-</div>
+                {/* Placar / Input */}
+                <div className="flex gap-2 items-center justify-center w-28">
+                  {jogo.status === 'completed' ? (
+                    <div className="text-1xl font-bold">
+                      {jogo.scoreA} x {jogo.scoreB}
+                    </div>
+                  ) : (
+                    <>
+                      <input
+                        type="number"
+                        className="w-12 h-12 text-center border rounded"
+                        value={placares[jogo.id]?.scoreA ?? ''}
+                        onChange={e => handleChange(jogo.id, 'scoreA', e.target.value)}
+                        disabled={jogoIniciado}
+                      />
+                      <span className="font-bold">x</span>
+                      <input
+                        type="number"
+                        className="w-12 h-12 text-center border rounded"
+                        value={placares[jogo.id]?.scoreB ?? ''}
+                        onChange={e => handleChange(jogo.id, 'scoreB', e.target.value)}
+                        disabled={jogoIniciado}
+                      />
+                    </>
+                  )}
+                </div>
 
-
-                <div className="text-center">
+                {/* Time B */}
+                <div className="w-28">
                   <img src={`/escudos/${jogo.teamB}.png`} alt={jogo.teamB} className="w-12 h-12 mx-auto" />
-                  <p className="font-semibold">{jogo.teamB}</p>
+                  <p className="font-semibold truncate">{jogo.teamB}</p>
                 </div>
               </div>
 
+              {/* Botão */}
               {jogo.status !== 'completed' && (
-  <div className="flex justify-center">
-    <button
-      onClick={() => enviarPalpite(jogo.id)}
-      className={`px-4 py-1 rounded text-white ${jogoIniciado ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-700 hover:bg-blue-800'}`}
-      disabled={jogoIniciado}
-    >
-      {palpites[jogo.id] ? 'Atualizar Palpite' : 'Enviar Palpite'}
-    </button>
-  </div>
-)}
+                <div className="flex justify-center">
+                  <button
+                    onClick={() => enviarPalpite(jogo.id)}
+                    className={`px-4 py-1 rounded text-white ${jogoIniciado ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-700 hover:bg-blue-800'}`}
+                    disabled={jogoIniciado}
+                  >
+                    {palpites[jogo.id] ? 'Atualizar Palpite' : 'Enviar Palpite'}
+                  </button>
+                </div>
+              )}
 
-
+              {/* Mensagem */}
               {mensagens[jogo.id] && (
                 <p className="text-sm text-green-600 text-center mt-2">
                   {mensagens[jogo.id]}
                 </p>
               )}
 
+              {/* Palpites de outros */}
               {jogoIniciado && palpitesOutros[jogo.id] && (
                 <div className="mt-4 border-t pt-3">
                   <p className="text-sm text-gray-700 font-semibold mb-1">Palpites dos outros jogadores:</p>
                   <ul className="text-sm text-gray-600 max-h-24 overflow-y-auto">
                     {palpitesOutros[jogo.id].map(p => (
                       <li key={p.id} className="flex justify-between border-b py-1">
-                        <span>{p.user.name || p.user.email}</span>
+                        <span className="truncate">{p.user.name || p.user.email}</span>
                         <span>{p.guessA} x {p.guessB}</span>
                       </li>
                     ))}
