@@ -140,7 +140,7 @@ export default function Palpitar() {
 
                 <div className="flex gap-2 items-center">
   {jogo.status === 'completed' ? (
-    <div className="text-3xl font-bold">
+    <div className="text-1xl font-bold">
       {jogo.scoreA} x {jogo.scoreB}
     </div>
   ) : (
