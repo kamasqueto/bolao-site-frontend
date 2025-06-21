@@ -16,18 +16,20 @@ export default function Ranking() {
     async function carregarRanking() {
       try {
         const res = await axios.get(`${API_URL}/guesses/ranking`);
-        setRanking(res.data);
+        const dadosRanking = res.data;
+        setRanking(dadosRanking);
 
+        // Após ranking carregado, identifica o usuário logado
         const storedUser = localStorage.getItem('user');
         if (storedUser) {
           const user = JSON.parse(storedUser);
-          const posicao = res.data.findIndex((r) => r.userId === user.id);
+          const posicao = dadosRanking.findIndex((r) => r.userId === user.id);
+
           if (posicao !== -1) {
-            const usuarioRanking = res.data[posicao];
             setMe({
               nome: user.name || user.email,
-              pontos: usuarioRanking.points,
-              posicao: posicao + 1,
+              pontos: dadosRanking[posicao].points,
+              posicao: posicao + 1
             });
           }
         }
@@ -52,6 +54,7 @@ export default function Ranking() {
       <h1 className="text-3xl font-bold text-center text-blue-900 mb-8">🏆 Ranking do Bolão</h1>
       {erro && <p className="text-red-600 text-center">{erro}</p>}
 
+      {/* Seu desempenho */}
       {me && (
         <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6 text-center shadow">
           <h2 className="text-xl font-semibold text-blue-800 mb-1">Seu Desempenho</h2>
@@ -62,6 +65,7 @@ export default function Ranking() {
         </div>
       )}
 
+      {/* Ranking geral */}
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
         <table className="w-full text-sm text-center">
           <thead className="bg-gray-100 text-gray-700 uppercase text-xs">
