@@ -13,32 +13,28 @@ export default function Ranking() {
 
   useEffect(() => {
     async function carregarRanking() {
-      try {
-        const token = localStorage.getItem('token');
-        const res = await axios.get(`${API_URL}/api/ranking`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
+      // Identifica o usuário logado
+const storedUser = localStorage.getItem('user');
+if (storedUser) {
+  try {
+    const user = JSON.parse(storedUser);
+    const ranking = res.data;
 
-        setRanking(res.data);
-        console.log(setRanking)
+    const posicao = ranking.findIndex((r) => r.userId === user.id);
 
-        // Identifica o usuário logado
-        const user = JSON.parse(localStorage.getItem('user'));
-        const posicao = res.data.findIndex((r) => r.userId === user?.id);
-        if (posicao !== -1) {
-          setMe({
-            nome: user?.name || user?.email,
-            pontos: res.data[posicao].points,
-            posicao: posicao + 1
-          });
-        }
+    if (posicao !== -1) {
+      const usuarioRanking = ranking[posicao];
+      setMe({
+        nome: user.name || user.email,
+        pontos: usuarioRanking.points,
+        posicao: posicao + 1,
+      });
+    }
+  } catch (error) {
+    console.error('Erro ao processar usuário logado no ranking:', error);
+  }
+}
 
-      } catch (err) {
-        console.error('Erro ao carregar ranking:', err);
-        setErro('Erro ao carregar ranking');
-      }
     }
 
     carregarRanking();
