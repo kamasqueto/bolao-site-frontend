@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { FaMedal, FaUserCircle } from 'react-icons/fa';
 import { useAuthRedirect } from '../hooks/useAuthRedirect';
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
+
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Ranking() {
@@ -13,28 +14,27 @@ export default function Ranking() {
 
   useEffect(() => {
     async function carregarRanking() {
-      // Identifica o usuário logado
-const storedUser = localStorage.getItem('user');
-if (storedUser) {
-  try {
-    const user = JSON.parse(storedUser);
-    const ranking = res.data;
+      try {
+        const res = await axios.get(`${API_URL}/guesses/ranking`);
+        setRanking(res.data);
 
-    const posicao = ranking.findIndex((r) => r.userId === user.id);
-
-    if (posicao !== -1) {
-      const usuarioRanking = ranking[posicao];
-      setMe({
-        nome: user.name || user.email,
-        pontos: usuarioRanking.points,
-        posicao: posicao + 1,
-      });
-    }
-  } catch (error) {
-    console.error('Erro ao processar usuário logado no ranking:', error);
-  }
-}
-
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          const user = JSON.parse(storedUser);
+          const posicao = res.data.findIndex((r) => r.userId === user.id);
+          if (posicao !== -1) {
+            const usuarioRanking = res.data[posicao];
+            setMe({
+              nome: user.name || user.email,
+              pontos: usuarioRanking.points,
+              posicao: posicao + 1,
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Erro ao carregar ranking:', error);
+        setErro('Erro ao carregar ranking. Tente novamente mais tarde.');
+      }
     }
 
     carregarRanking();
@@ -52,7 +52,6 @@ if (storedUser) {
       <h1 className="text-3xl font-bold text-center text-blue-900 mb-8">🏆 Ranking do Bolão</h1>
       {erro && <p className="text-red-600 text-center">{erro}</p>}
 
-      {/* 🧑‍💼 RESUMO DO USUÁRIO */}
       {me && (
         <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6 text-center shadow">
           <h2 className="text-xl font-semibold text-blue-800 mb-1">Seu Desempenho</h2>
@@ -63,7 +62,6 @@ if (storedUser) {
         </div>
       )}
 
-      {/* TABELA DO RANKING */}
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
         <table className="w-full text-sm text-center">
           <thead className="bg-gray-100 text-gray-700 uppercase text-xs">
@@ -82,7 +80,9 @@ if (storedUser) {
                     {getMedalha(index)}
                   </div>
                 </td>
-                <td className="px-4 py-3 font-medium text-gray-800"><Link to={`/perfil/${item.id}`}>{item.name}</Link></td>
+                <td className="px-4 py-3 font-medium text-gray-800">
+                  <Link to={`/perfil/${item.id}`}>{item.name}</Link>
+                </td>
                 <td className="px-4 py-3 text-green-700 font-bold">{item.points}</td>
               </tr>
             ))}
