@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import dayjs from 'dayjs';
 import { useAuthRedirect } from '../hooks/useAuthRedirect';
 import api from '../hooks/axios.js';
-const API_URL = import.meta.env.VITE_API_URL;
+import CardJogo from '../components/CardJogo';
+import FiltroRodadas from '../components/FilterRound.jsx';
 
 export default function Palpitar() {
   useAuthRedirect();
@@ -12,6 +12,7 @@ export default function Palpitar() {
   const [placares, setPlacares] = useState({});
   const [palpites, setPalpites] = useState({});
   const [palpitesOutros, setPalpitesOutros] = useState({});
+  const [rodadaAtual, setRodadaAtual] = useState('');
 
   useEffect(() => {
     async function carregarJogos() {
@@ -54,6 +55,10 @@ export default function Palpitar() {
         setPalpites(palpitesMap);
         setPlacares(placaresMap);
         setPalpitesOutros(outrosMap);
+
+        const hoje = dayjs();
+        const rodadaHoje = jogosOrdenados.find(j => dayjs(j.date).isAfter(hoje.subtract(1, 'day')))?.stage || '';
+        setRodadaAtual(rodadaHoje);
       } catch (err) {
         console.error('Erro ao carregar jogos:', err);
       }
@@ -105,95 +110,36 @@ export default function Palpitar() {
     }
   };
 
+  const jogosFiltrados = jogos.filter(j => j.stage === rodadaAtual);
+
   return (
     <div className="max-w-5xl mx-auto mt-6 px-4">
       <h2 className="text-2xl font-bold mb-6 text-center">Faça seus palpites</h2>
 
+      <FiltroRodadas
+        jogos={jogos}
+        rodadaAtiva={rodadaAtual}
+        onChange={setRodadaAtual}
+      />
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {jogos.map(jogo => {
+        {jogosFiltrados.map(jogo => {
           const dataJogo = dayjs(jogo.date);
           const agora = dayjs();
           const jogoIniciado = agora.isAfter(dataJogo.subtract(10, 'minutes'));
 
           return (
-            <div key={jogo.id} className="border p-4 rounded shadow bg-white w-full min-w-[300px] max-w-full overflow-hidden">
-              <div className="text-sm text-gray-500 text-center mb-2">
-                {dataJogo.format('DD/MM/YYYY [às] HH:mm')}<br />
-                {jogo.status === 'in_progress'
-                  ? 'Em andamento'
-                  : jogo.status === 'completed'
-                    ? 'Finalizado'
-                    : 'Agendado'}
-              </div>
-
-              <div className="flex justify-center items-center gap-6 mb-4 text-center">
-                <div className="w-32 flex flex-col items-center">
-                  <img src={`/escudos/${jogo.teamA}.png`} alt={jogo.teamA} className="w-12 h-12 mb-1" />
-                  <p className="font-semibold text-sm leading-tight text-center break-words min-h-[2.5rem]">{jogo.teamA}</p>
-                </div>
-
-                <div className="flex items-center justify-center gap-2 w-28 flex-shrink-0">
-                  {jogo.status === 'completed' ? (
-                    <div className="text-xl font-bold w-full text-center">{jogo.scoreA} x {jogo.scoreB}</div>
-                  ) : (
-                    <>
-                      <input
-                        type="number"
-                        className="w-12 h-12 text-center border rounded"
-                        value={placares[jogo.id]?.scoreA ?? ''}
-                        onChange={e => handleChange(jogo.id, 'scoreA', e.target.value)}
-                        disabled={jogoIniciado}
-                      />
-                      <span className="font-bold">x</span>
-                      <input
-                        type="number"
-                        className="w-12 h-12 text-center border rounded"
-                        value={placares[jogo.id]?.scoreB ?? ''}
-                        onChange={e => handleChange(jogo.id, 'scoreB', e.target.value)}
-                        disabled={jogoIniciado}
-                      />
-                    </>
-                  )}
-                </div>
-
-                <div className="w-32 flex flex-col items-center">
-                  <img src={`/escudos/${jogo.teamB}.png`} alt={jogo.teamB} className="w-12 h-12 mb-1" />
-                  <p className="font-semibold text-sm leading-tight text-center break-words min-h-[2.5rem]">{jogo.teamB}</p>
-                </div>
-              </div>
-
-              {jogo.status !== 'completed' && (
-                <div className="flex justify-center">
-                  <button
-                    onClick={() => enviarPalpite(jogo.id)}
-                    className={`px-4 py-1 rounded text-white ${jogoIniciado ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-700 hover:bg-blue-800'}`}
-                    disabled={jogoIniciado}
-                  >
-                    {palpites[jogo.id] ? 'Atualizar Palpite' : 'Enviar Palpite'}
-                  </button>
-                </div>
-              )}
-
-              {mensagens[jogo.id] && (
-                <p className="text-sm text-green-600 text-center mt-2">
-                  {mensagens[jogo.id]}
-                </p>
-              )}
-
-              {jogoIniciado && palpitesOutros[jogo.id] && (
-                <div className="mt-4 border-t pt-3">
-                  <p className="text-sm text-gray-700 font-semibold mb-1">Palpites dos outros jogadores:</p>
-                  <ul className="text-sm text-gray-600 max-h-24 overflow-y-auto">
-                    {palpitesOutros[jogo.id].map(p => (
-                      <li key={p.id} className="flex justify-between border-b py-1">
-                        <span className="truncate">{p.user.name || p.user.email}</span>
-                        <span>{p.guessA} x {p.guessB}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
+            <CardJogo
+              key={jogo.id}
+              jogo={jogo}
+              placares={placares}
+              palpites={palpites}
+              palpitesOutros={palpitesOutros}
+              mensagens={mensagens}
+              jogoIniciado={jogoIniciado}
+              handleChange={handleChange}
+              enviarPalpite={enviarPalpite}
+            />
           );
         })}
       </div>

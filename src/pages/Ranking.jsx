@@ -1,45 +1,44 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { FaMedal, FaUserCircle } from 'react-icons/fa';
 import { useAuthRedirect } from '../hooks/useAuthRedirect';
 import { Link } from "react-router-dom";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import api from '../hooks/axios.js';
 
 export default function Ranking() {
   useAuthRedirect();
+
   const [ranking, setRanking] = useState([]);
   const [erro, setErro] = useState('');
   const [me, setMe] = useState(null);
 
   useEffect(() => {
-    async function carregarRanking() {
+    async function carregarDados() {
       try {
-        const res = await axios.get(`${API_URL}/guesses/ranking`);
-        const dadosRanking = res.data;
+        const [rankingRes, userRes] = await Promise.all([
+          api.get('/api/guesses/ranking'),
+          api.get('/api/auth/me'),
+        ]);
+
+        const dadosRanking = rankingRes.data;
+        const usuarioLogado = userRes.data;
+
         setRanking(dadosRanking);
 
-        // Após ranking carregado, identifica o usuário logado
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-          const user = JSON.parse(storedUser);
-          const posicao = dadosRanking.findIndex((r) => r.userId === user.id);
-
-          if (posicao !== -1) {
-            setMe({
-              nome: user.name || user.email,
-              pontos: dadosRanking[posicao].points,
-              posicao: posicao + 1
-            });
-          }
+        const posicao = dadosRanking.findIndex(r => r.userId === usuarioLogado.id);
+        if (posicao !== -1) {
+          setMe({
+            nome: usuarioLogado.name || usuarioLogado.email,
+            pontos: dadosRanking[posicao].points,
+            posicao: posicao + 1
+          });
         }
       } catch (error) {
-        console.error('Erro ao carregar ranking:', error);
+        console.error('Erro ao carregar dados do ranking:', error);
         setErro('Erro ao carregar ranking. Tente novamente mais tarde.');
       }
     }
 
-    carregarRanking();
+    carregarDados();
   }, []);
 
   const getMedalha = (index) => {
@@ -54,7 +53,7 @@ export default function Ranking() {
       <h1 className="text-3xl font-bold text-center text-blue-900 mb-8">🏆 Ranking do Bolão</h1>
       {erro && <p className="text-red-600 text-center">{erro}</p>}
 
-      {/* Seu desempenho */}
+      {/* 🧑‍💼 Seu desempenho */}
       {me && (
         <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6 text-center shadow">
           <h2 className="text-xl font-semibold text-blue-800 mb-1">Seu Desempenho</h2>
@@ -65,7 +64,7 @@ export default function Ranking() {
         </div>
       )}
 
-      {/* Ranking geral */}
+      {/* 🏅 Tabela do ranking geral */}
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
         <table className="w-full text-sm text-center">
           <thead className="bg-gray-100 text-gray-700 uppercase text-xs">
