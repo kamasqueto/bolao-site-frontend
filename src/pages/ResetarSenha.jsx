@@ -1,41 +1,47 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 const API_URL = import.meta.env.VITE_API_URL;
 
-export default function Login() {
-  const [email, setEmail] = useState('');
+export default function ResetarSenha() {
+  const { token } = useParams();
+  const navigate = useNavigate();
   const [password, setPassword] = useState('');
+  const [confirmarPassword, setConfirmarPassword] = useState('');
   const [mensagem, setMensagem] = useState(null);
   const [tipoMensagem, setTipoMensagem] = useState(null);
-  const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setMensagem(null);
+
+    if (password !== confirmarPassword) {
+      setTipoMensagem('erro');
+      setMensagem('As senhas não coincidem.');
+      return;
+    }
+
     try {
-      const res = await axios.post(`${API_URL}/api/auth/login`, {
-        email,
+      const res = await axios.post(`${API_URL}/api/auth/reset-password/${token}`, {
         password,
       });
-      localStorage.setItem('token', res.data.token);
-      navigate('/');
+
+      setTipoMensagem('sucesso');
+      setMensagem(res.data.message || 'Senha redefinida com sucesso!');
+      setTimeout(() => navigate('/login'), 3000);
     } catch (err) {
       setTipoMensagem('erro');
-      if (err.response?.status === 401) {
-        setMensagem('E-mail ou senha inválidos.');
-      } else {
-        setMensagem('Erro ao realizar login. Tente novamente.');
-      }
+      setMensagem(
+        err.response?.data?.message || 'Erro ao redefinir senha. Tente novamente.'
+      );
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-blue-100">
       <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-bold text-center mb-6 text-blue-900">Entrar no Bolão</h2>
+        <h2 className="text-2xl font-bold text-center mb-6 text-blue-900">Redefinir Senha</h2>
 
-        {/* MENSAGEM DE ERRO OU SUCESSO */}
         {mensagem && (
           <div
             className={`mb-4 px-4 py-2 text-sm rounded ${
@@ -48,43 +54,37 @@ export default function Login() {
           </div>
         )}
 
-        <form onSubmit={handleLogin} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <input
-            type="email"
-            placeholder="Email"
+            type="password"
+            placeholder="Nova senha"
             className="w-full px-4 py-2 border rounded"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             required
           />
           <input
             type="password"
-            placeholder="Senha"
+            placeholder="Confirmar nova senha"
             className="w-full px-4 py-2 border rounded"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={confirmarPassword}
+            onChange={(e) => setConfirmarPassword(e.target.value)}
             required
           />
           <button
             type="submit"
             className="w-full bg-blue-900 text-white py-2 rounded hover:bg-blue-800"
           >
-            Entrar
+            Redefinir senha
           </button>
         </form>
 
-        <div className="mt-4 flex justify-between text-sm text-blue-700">
+        <div className="mt-4 text-center">
           <button
-            onClick={() => navigate('/esqueci-senha')}
-            className="hover:underline"
+            onClick={() => navigate('/login')}
+            className="text-sm text-blue-700 hover:underline"
           >
-            Esqueci minha senha
-          </button>
-          <button
-            onClick={() => navigate('/cadastro')}
-            className="hover:underline"
-          >
-            Cadastre-se
+            Voltar para login
           </button>
         </div>
       </div>

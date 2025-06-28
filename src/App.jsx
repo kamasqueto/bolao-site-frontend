@@ -11,6 +11,8 @@ import MeusPalpites from './pages/MeusPalpites.jsx';
 import Palpitar from './pages/Palpitar.jsx';
 import PerfilParticipante from './pages/PerfilParticipante.jsx';
 import Jogos from './pages/Jogos.jsx';
+import EsqueciSenha from './pages/EsqueciSenha.jsx';
+import ResetarSenha from './pages/ResetarSenha.jsx';
 
 function App() {
   return (
@@ -19,6 +21,8 @@ function App() {
         {/* Login sem Navbar */}
         <Route path="/login" element={<Login />} />
         <Route path='/cadastro' element={<Cadastro/>}/>
+        <Route path="/esqueci-senha" element={<EsqueciSenha />} />
+        <Route path="/resetar-senha/:token" element={<ResetarSenha />} />
         <Route path='/painel' element={
     <ProtectedRoute>
       <Painel />

@@ -5,6 +5,7 @@ const stageTraduzido = {
   'Round 1': 'Rodada 1',
   'Round 2': 'Rodada 2',
   'Round 3': 'Rodada 3',
+  'Round of 16' : 'Oitavas de Final',
   'Quarter-finals': 'Quartas de Final',
   'Semi-finals': 'Semifinal',
   'Final': 'Final'
