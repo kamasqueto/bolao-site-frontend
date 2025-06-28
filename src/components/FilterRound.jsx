@@ -18,7 +18,7 @@ export default function FiltroRodadas({ jogos, rodadaAtiva, onChange }) {
   useEffect(() => {
     const unicosStages = [...new Set(jogos.map(j => j.stage))];
     const ordenados = unicosStages.sort((a, b) => {
-      const ordem = ['Round 1', 'Round 2', 'Round 3', 'Quarter-finals', 'Semi-finals', 'Final'];
+      const ordem = ['Round 1', 'Round 2', 'Round 3', 'Round of 16', 'Quarter-finals', 'Semi-finals', 'Final'];
       return ordem.indexOf(a) - ordem.indexOf(b);
     });
     setRodadasDisponiveis(ordenados);
