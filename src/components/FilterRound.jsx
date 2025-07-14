@@ -23,7 +23,7 @@ const stageTraduzido = {
   'Round 20': 'Rodada 20',
   'Quarter-finals': 'Quartas de Final',
   'Semi-finals': 'Semifinal',
-  'Final': 'Final',
+  'Final': 'Final'
 };
 
 const ordemOficial = Object.keys(stageTraduzido);
@@ -48,29 +48,28 @@ export default function FiltroRodadas({ jogos, rodadaAtiva, onChange }) {
     setSelecionado(rodadaAtiva);
   }, [rodadaAtiva]);
 
-  const handleSelecionar = (stage) => {
-    setSelecionado(stage);
-    onChange(stage);
+  const handleSelecionar = (e) => {
+    const nova = e.target.value;
+    setSelecionado(nova);
+    onChange(nova);
   };
 
   return (
-    <div className="overflow-x-auto whitespace-nowrap pb-3">
-      <div className="inline-flex gap-2">
+    <div className="mb-6 text-center">
+      <label className="block mb-1 text-sm font-medium text-blue-800">
+        Selecione a Rodada:
+      </label>
+      <select
+        value={selecionado}
+        onChange={handleSelecionar}
+        className="border border-blue-300 rounded px-3 py-2 text-sm w-full max-w-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
         {rodadasDisponiveis.map(stage => (
-          <button
-            key={stage}
-            className={`px-3 py-1 rounded-full border font-medium text-sm transition duration-200 whitespace-nowrap
-              ${selecionado === stage
-                ? 'bg-blue-700 text-white border-blue-700'
-                : 'bg-white text-blue-700 border-blue-700 hover:bg-blue-50'}
-            `}
-            onClick={() => handleSelecionar(stage)}
-            aria-pressed={selecionado === stage}
-          >
+          <option key={stage} value={stage}>
             {stageTraduzido[stage] || stage}
-          </button>
+          </option>
         ))}
-      </div>
+      </select>
     </div>
   );
 }
