@@ -28,7 +28,7 @@ export default function Home() {
     <div className="min-h-screen bg-blue-100 py-10 px-4">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-bold text-center text-blue-900 mb-6">
-          Bem-vindo ao Bolão do Mundial de Clubes 2025!
+          Bem-vindo ao Bolão do Brasileirão 2025!
         </h1>
 
         {!isLoggedIn && (
@@ -87,7 +87,7 @@ export default function Home() {
             <li>5 pontos para acerto do placar exato</li>
             <li>3 pontos para acerto do vencedor ou empate</li>
             <li>0 pontos para palpites errados</li>
-            <li>Palpites só podem ser enviados até 2 horas antes do jogo</li>
+            <li>Palpites só podem ser enviados até o inicio do jogo</li>
             <li>O ranking é atualizado automaticamente após cada resultado</li>
           </ul>
         </div>
