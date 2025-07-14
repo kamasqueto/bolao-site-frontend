@@ -31,7 +31,7 @@ export default function CardJogo({
         {/* Time A */}
         <div className="flex flex-col items-center justify-center w-1/3">
           <img
-            src={`/escudos/${jogo.teamA}.png`}
+            src={`./escudos/${jogo.teamA}.png`}
             alt={jogo.teamA}
             className="w-14 h-14 object-contain mb-1"
           />
